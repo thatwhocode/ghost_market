@@ -1,2 +1,5 @@
-/secrets
-/.vscode
+secrets/
+.env
+__pycache__/
+*.pyc
+.vscode/

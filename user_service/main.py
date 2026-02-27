@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from user_service.db.database import get_db
 from contextlib import asynccontextmanager
 from user_service.api import auth
+from user_service.api import admin
 from fastapi.middleware.cors import CORSMiddleware
 from user_service.api.middleware import db_exception_middleware
 @asynccontextmanager
@@ -17,3 +18,4 @@ api_version_prefix = "v1"
 app = FastAPI(lifespan=lifespan)
 app.middleware("http")(db_exception_middleware)
 app.include_router(auth.router, prefix=f"/{api_version_prefix}/auth", tags=["Auth"])
+app.include_router(admin.router)

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 sys.path.insert(0, "/app")
 from alembic import context
 
-from user_service.db.models.user import User  
+from shared_packages.db.user import User  
 from user_service.db.database import Base, settings 
 
 config = context.config

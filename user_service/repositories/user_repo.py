@@ -39,11 +39,12 @@ class UserRepository():
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def update_user(self, user_id : UUID, update_data: dict):
+    async def update_user_by_id(self, user_id : UUID, update_data: dict):
+        print(f"{update_data}")
         query = (
         update(User)
         .where(User.id == user_id)
-        .values(**update_data)
+        .values(**update_data) 
         .returning(User)
     )
     

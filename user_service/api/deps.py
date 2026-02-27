@@ -35,3 +35,8 @@ class Dependencies:
         if not user.is_superuser:
             raise HTTPException(status_code=403, detail="Rights required")
         return user
+class AdminRequired:
+    async def __call__(self, deps: Dependencies = Depends(Dependencies)):
+        return await deps.get_current_admin()
+    
+admin_guard = AdminRequired()

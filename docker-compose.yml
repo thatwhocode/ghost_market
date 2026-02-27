@@ -18,7 +18,7 @@ services:
       - postgres_auth_password
       - postgres_auth_host_name
     ports:
-      - "5434:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -44,7 +44,7 @@ services:
       - postgres_auth_host_name
       - jwt_secret_key
     ports:
-      - "8002:8002"
+      - "${API_PORT}:${CONTAINER_PORT:-8000}"
     volumes:
       - .:/app
 
