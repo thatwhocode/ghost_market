@@ -55,7 +55,7 @@ class PostgresSettings(SharedBaseSettings):
     Налаштування тільки для баз даних
     """
     POSTGRES_HOST_FILE: Optional[str] = None
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_HOST: str = "ghost_market_db"
     
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = "postgres"
@@ -75,7 +75,7 @@ class PostgresSettings(SharedBaseSettings):
         password = self._get_secret_value(self.POSTGRES_PASSWORD_FILE, self.POSTGRES_PASSWORD, "password")
         postgres_db = self._get_secret_value(self.POSTGRES_DB_FILE, self.POSTGRES_DB,"db_name" )
         
-        return f"postgresql+asyncpg://{user}:{password}@{host}:{self.POSTGRES_PORT}/{postgres_db}"
+        return f"postgresql+asyncpg://{user}:{password}@ghost_market_db:{self.POSTGRES_PORT}/{postgres_db}"
 
 
 class RedisSettings(SharedBaseSettings):
