@@ -35,7 +35,7 @@ jobs:
             sleep 5
           done
           docker ps
-          docker-compose logs nginx
+          docker compose logs nginx
      - name: Check conts status
        run: docker ps
      - name: Wait for migrations and startup
