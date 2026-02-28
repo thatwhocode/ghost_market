@@ -6,7 +6,7 @@ jobs:
     steps:
      - uses: actions/checkout@v4
 
-     - name: Create .env  file and secrets
+     - name: Create .env  file and secrets and nginx ssl
        run: |
           cp .env.example .env
           sed -i 's#POSTGRES_PASSWORD=.*#POSTGRES_PASSWORD=testpass#' .env
@@ -18,8 +18,24 @@ jobs:
           echo "localhost" > secrets/postgres_auth_host_name.txt
           echo "supersecret" > secrets/jwt_secret_key.txt
 
+          mkdir -p nginx/ssl
+          openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+            -keyout nginx/ssl/nginx.key \
+            -out nginx/ssl/nginx.crt \
+            -subj "/C=PL/L=Krakow/O=GhostMarketCI/CN=localhost
+
      - name: Build app and run Docker conts
        run: docker compose up --build -d
+     - name: Wait for Nginx to be ready
+       run: |
+          # Ми використовуємо curl -k (ігноруємо SSL), щоб перевірити доступність
+          for i in {1..12}; do
+            curl -k https://localhost:443/docs && echo "Nginx is UP" && break
+            echo "Waiting for Nginx... ($i/12)"
+            sleep 5
+          done
+          docker ps
+          docker-compose logs nginx
      - name: Check conts status
        run: docker ps
      - name: Wait for migrations and startup
