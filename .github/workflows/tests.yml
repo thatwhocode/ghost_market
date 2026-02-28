@@ -1,0 +1,46 @@
+name: Ghost Market CI
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v4
+
+     - name: Create .env  file and secrets
+       run: |
+          cp .env.example .env
+          sed -i 's#POSTGRES_PASSWORD=.*#POSTGRES_PASSWORD=testpass#' .env
+          
+          mkdir -p secrets
+          echo "ghost_db" > secrets/postgres_auth_db_name.txt
+          echo "postgres" > secrets/postgres_auth_login.txt
+          echo "testpass" > secrets/postgres_auth_password.txt
+          echo "localhost" > secrets/postgres_auth_host_name.txt
+          echo "supersecret" > secrets/jwt_secret_key.txt
+
+     - name: Build app and run Docker conts
+       run: docker compose up --build -d
+     - name: Check conts status
+       run: docker ps
+     - name: Wait for migrations and startup
+       run: sleep 30
+     - name: Wait for SSL Services
+       run: |
+          for i in {1..10}; do
+            curl -k https://localhost/docs && break || sleep 5
+          done
+     -  name: Run SSL Integration Tests
+        run: |
+          pip install httpx pytest pytest-asyncio
+          PYTHONPATH=. pytest -W ignore::urllib3.exceptions.InsecureRequestWarning user_service/tests/test_integration.py
+     - name: Run Integrations Tests
+       run: docker compose exec -T ghost_api pytest tests/
+     - name: Deploy to Windows Branch
+       if: success()
+       run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Створюємо/оновлюємо гілку для друга
+          git checkout -B windows-release
+          git push origin windows-release --force

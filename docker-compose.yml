@@ -1,0 +1,74 @@
+services:
+  nginx:
+    image : nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl/:/etc/nginx/ssl:ro
+    depends_on:
+      - ghost_api
+  db:
+    image: postgres:13
+    container_name: ghost_market_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/postgres_auth_login) -d $$(cat /run/secrets/postgres_auth_db_name)"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres_auth_login
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_auth_db_name
+    secrets:
+      - postgres_auth_db_name
+      - postgres_auth_login
+      - postgres_auth_password
+      - postgres_auth_host_name
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ghost_api:
+    build:
+      context: .
+      dockerfile: user_service/Dockerfile
+    container_name: gost_market_user_api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres_auth_login
+      POSTGRES_HOST_FILE: /run/secrets/postgres_auth_host_name
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_auth_db_name
+      PYTHONPATH: /app
+      SECRET_KEY_FILE: /run/secrets/jwt_secret
+    secrets:
+      - postgres_auth_db_name
+      - postgres_auth_login
+      - postgres_auth_password
+      - postgres_auth_host_name
+      - jwt_secret_key
+    expose:
+      - "8000"
+    volumes:
+      - .:/app
+
+secrets:
+  postgres_auth_db_name:
+    file: ./secrets/postgres_auth_db_name.txt
+  postgres_auth_login:
+    file: ./secrets/postgres_auth_login.txt
+  postgres_auth_password:
+    file: ./secrets/postgres_auth_password.txt
+  postgres_auth_host_name:
+    file: ./secrets/postgres_auth_host_name.txt
+  jwt_secret_key:
+    file: ./secrets/jwt_secret_key.txt
+
+volumes:
+  postgres_data:

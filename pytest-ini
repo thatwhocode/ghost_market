@@ -1,0 +1,5 @@
+# user_service/pytest.ini
+[pytest]
+asyncio_mode = auto
+filterwarnings =
+    ignore::urllib3.exceptions.InsecureRequestWarning
