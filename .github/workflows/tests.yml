@@ -45,9 +45,10 @@ jobs:
           for i in {1..10}; do
             curl -k https://localhost/docs && break || sleep 5
           done
-     -  name: Run SSL Integration Tests
-        run: |
+     - name: Run SSL Integration Tests
+       run: |
           pip install httpx pytest pytest-asyncio
+          # PYTHONPATH=. дозволяє знайти модулі, якщо тести лежать у папці
           PYTHONPATH=. pytest -W ignore::urllib3.exceptions.InsecureRequestWarning user_service/tests/test_integration.py
      - name: Run Integrations Tests
        run: docker compose exec -T ghost_api pytest tests/
