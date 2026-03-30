@@ -1,0 +1,22 @@
+trigger:
+  branches:
+    include:
+      - '*'
+  paths:
+    include:
+      - '**'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- checkout: self
+  persistCredentials: true
+  
+- script: |
+    git config user.email "youremail@example.com"
+    git config user.name "Your Name"
+    git remote add upstream https://$(GITHUB_PAT)@github.com/yourusername/your-repo.git
+    git fetch upstream
+    git push --mirror origin
+  displayName: 'Sync with GitHub'
