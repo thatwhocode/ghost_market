@@ -1,17 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 import uuid
-from user_service.api.deps import Dependencies, admin_guard
+from user_service.api.deps import Dependencies, AdminRequired
 from user_service.schemas.user import UserAdminView
 from shared_packages.db.user import User
-async def check_admin_access(deps: Dependencies = Depends(Dependencies)):
-    await deps.get_current_admin()
-router = APIRouter(prefix="/v1/admin", tags=["Admin"])
+router = APIRouter(prefix="/v1/admin", tags=["Admin"], dependencies=[Depends(AdminRequired())])
 
 @router.get("/users", response_model=list[UserAdminView])
 async def list_all_users(
     skip: int = 0,
     limit: int = 100,
-    deps: Dependencies = Depends()):
+    deps: Dependencies = Depends(Dependencies)):
     return await deps.user_repo.get_all_users(skip, limit)
 
 @router.patch("/users/{user_id}/status", response_model=UserAdminView)

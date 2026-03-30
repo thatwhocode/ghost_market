@@ -31,8 +31,10 @@ class AuthService:
         if username:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                      detail="this username already exist")
-        password = get_password_hash(user_data.password)
-        return await self.user_repo.create_user(user_data=user_data, hashed_password=password)
+        new_user = self.user_repo.create_user(user_data)
+        await self.user_repo.session.refresh(new_user)
+        await self.user_repo.session.commit()
+        return new_user
     
     async def login_with_email(self, user_data:UserLoginEmail ) -> Token:
         user  = await self.user_repo.find_user_email(user_email=user_data.email)

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, func
 from shared_packages.db.user  import User
-from user_service.schemas.user import UserBase, UserLogin, UserRead, AdminStatsRead
+from user_service.schemas.user import UserBase, UserLogin, UserRead, AdminStatsRead, UserCreate
 from uuid import UUID
 from user_service.core.security import get_password_hash
 class UserRepository():
@@ -19,14 +19,14 @@ class UserRepository():
         return result.scalar_one_or_none()
     
     
-    async def create_user(self, user_data : UserLogin, hashed_password: str) -> User | None:
+    async def create_user(self, user_data : UserCreate) -> User | None:
         new_user = User(
             email = user_data.email,
             username = user_data.username,
-            hashed_password= hashed_password
+            hashed_password= get_password_hash(user_data.password.get_secret_value())
         )
         self.session.add(new_user)
-        await self.session.commit()
+        await self.session.flush()
         await self.session.refresh(new_user)
         return new_user
     async def find_user_by_id(self, user_id : UUID)-> UserRead:

@@ -1,38 +1,14 @@
-# 🚀 Backend (Local Environment)
+🐍 Core Stack
+Category 	Technologies
+Web Framework 	FastAPI + uvicorn – async REST API
+Database 	SQLAlchemy 2.0 (async) + asyncpg + alembic – PostgreSQL with async ORM and migrations
+Validation & Config 	Pydantic + pydantic-settings – request/response validation and environment config
+Authentication 	python-jose (JWT), passlib (bcrypt/hashing), cryptography – token handling and password security
+Utilities 	python-multipart – file upload support (card images?), python-stdnum – possibly for validation of numbers (e.g., tax IDs, not critical)
+⚙️ Architecture Notes
 
-Бекенд для нашої гри. Працює в ізольованому Docker-середовищі (API + PostgreSQL + Redis) з використанням індустріальних стандартів безпеки (Docker Secrets).
+    Async‑first – The whole stack (FastAPI, SQLAlchemy, asyncpg) is asynchronous, which fits a game backend where many I/O operations happen concurrently.
 
-## 🛠 Крок 1: Підготовка системи (ТІЛЬКИ ДЛЯ WINDOWS)
-1. Встанови [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-2. **КРИТИЧНО ВАЖЛИВО:** В налаштуваннях Docker Desktop обов'язково має бути увімкнена опція **"Use WSL 2 based engine"** (Hyper-V працювати не буде!).
-3. Переконайся, що порти `8000`, `5432` та `6379` не зайняті іншими локальними програмами.
+    Authentication ready – JWT tokens are implemented (via python-jose) and passwords are hashed (via passlib), so user accounts are secure.
 
-## 🔐 Крок 2: Налаштування секретів (ОБОВ'ЯЗКОВО)
-Ми не зберігаємо паролі у відкритому вигляді. Тобі потрібно створити локальні секрети для Докера.
-1. У корені проєкту (там, де лежить цей README) створи папку з назвою **`secrets`**.
-2. У цій папці створи звичайні текстові файли і впиши в них паролі (можеш придумати будь-які для локальної розробки). 
-
-**УВАГА ДЛЯ WINDOWS:** Переконайся, що в тебе увімкнено відображення розширень файлів! Файли не повинні мати подвійних розширень типу `.txt.txt`.
-
-Створи такі файли в папці `secrets/`:
-* secrets/postgres_auth_db_name.txt
-* secrets/postgres_auth_login.txt
-* secrets/postgres_auth_password.txt
-* secrets/postgres_auth_host_name.txt
-* secrets/jwt_secret_key.txt
-
-## ⚙️ Крок 3: Змінні оточення
-1. У корені проєкту знайди файл `.env.example`.
-2. Скопіюй його і назви копію просто **`.env`**.
-3. За потреби зміни там порти (якщо дефолтні в тебе зайняті).
-
-## 🎮 Крок 4: Запуск
-Тобі не треба вчити команди терміналу. 
-1. Двічі клікни на файл **`start_backend.bat`**.
-2. Зачекай близько хвилини. Скрипт сам збере контейнери, підніме базу даних і накотить актуальні міграції таблиць.
-
-## 📡 Де шукати API
-Коли консоль напише, що все готово, інтерактивна документація (де можна тестувати запити) буде тут:
-👉 [http://localhost:8000/docs](http://localhost:8000/docs)
-
-Якщо щось зламалося або хочеш повністю скинути базу до чистого стану — просто запусти `start_backend.bat` ще раз.
+    Database migrations – alembic is included, so schema changes are versioned.

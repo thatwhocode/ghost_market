@@ -2,7 +2,7 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from user_service.schemas.user import UserCreate, UserLoginEmail, UserRead, UserLoginUsername, UserUpdate, UserShort
-from user_service.api.deps import Dependencies, AuthService, oauth2_scheme
+from user_service.api.deps import Dependencies, AuthService, oauth2_scheme, AdminRequired
 from shared_packages.schemas.token import Token
 from uuid import UUID
 from user_service.schemas.user import UserBase

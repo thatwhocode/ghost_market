@@ -1,4 +1,19 @@
 services:
+  ghost_redis:
+    image: redis:8.6-alpine
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a $$(cat /run/secrets/redis_password) ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    ports:
+     - '6378:6379'
+    command: sh -c "redis-server --save 20 1 --loglevel warning --requirepass $$(cat /run/secrets/redis_password)"
+    secrets:
+     - redis_password
+    volumes:
+     - redis:/data
   nginx:
     image : nginx:latest
     ports:
@@ -36,11 +51,17 @@ services:
     build:
       context: .
       dockerfile: user_service/Dockerfile
-    container_name: gost_market_user_api
+    container_name: ghost_market_user_api
     depends_on:
       db:
         condition: service_healthy
+      ghost_redis:
+        condition: service_healthy
     environment:
+      environment:
+      ADMIN_EMAIL_FILE: /run/secrets/admin_email
+      ADMIN_USERNAME_FILE: /run/secrets/admin_username
+      ADMIN_PASSWORD_FILE: /run/secrets/admin_password
       POSTGRES_USER_FILE: /run/secrets/postgres_auth_login
       POSTGRES_HOST_FILE: /run/secrets/postgres_auth_host_name
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_auth_password
@@ -48,6 +69,9 @@ services:
       PYTHONPATH: /app
       SECRET_KEY_FILE: /run/secrets/jwt_secret
     secrets:
+      - admin_email
+      - admin_username
+      - admin_password
       - postgres_auth_db_name
       - postgres_auth_login
       - postgres_auth_password
@@ -69,6 +93,14 @@ secrets:
     file: ./secrets/postgres_auth_host_name.txt
   jwt_secret_key:
     file: ./secrets/jwt_secret_key.txt
-
+  admin_email:
+    file: ./secrets/admin_email.txt
+  admin_username:
+    file: ./secrets/admin_username.txt
+  admin_password:
+    file: ./secrets/admin_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt
 volumes:
   postgres_data:
+  redis:

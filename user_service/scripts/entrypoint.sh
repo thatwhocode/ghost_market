@@ -31,6 +31,7 @@ cd /app/user_service
 alembic upgrade head
 
 echo "Migrations completed - starting FastAPI on port ${API_PORT}"
+python -m user_service.scripts.create_admin
 
 # Використовуємо API_PORT з .env для запуску uvicorn
-exec uvicorn user_service.main:app --host 0.0.0.0 --port ${CONTAINER_PORT:-8000}
+exec uvicorn user_service.main:app --host 0.0.0.0 --port ${CONTAINER_PORT:-8000} --reload
