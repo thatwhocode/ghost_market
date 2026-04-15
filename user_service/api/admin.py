@@ -3,6 +3,8 @@ import uuid
 from user_service.api.deps import Dependencies, admin_guard
 from user_service.schemas.user import UserAdminView
 from shared_packages.db.user import User
+import structlog
+logger = structlog.get_logger()
 async def check_admin_access(deps: Dependencies = Depends(Dependencies)):
     await deps.get_current_admin()
 router = APIRouter(prefix="/v1/admin", tags=["Admin"])
@@ -12,6 +14,7 @@ async def list_all_users(
     skip: int = 0,
     limit: int = 100,
     deps: Dependencies = Depends()):
+    logger.info("Users was listed by admin")
     return await deps.user_repo.get_all_users(skip, limit)
 
 @router.patch("/users/{user_id}/status", response_model=UserAdminView)
@@ -19,7 +22,7 @@ async def toggle_ban(
     user_id: uuid.UUID,
     is_active: bool,
     deps: Dependencies = Depends(Dependencies)):
-
+    logger.info("user_was_banned", extra = f"{user_id=}")
     user = await deps.auth_service.toggle_user_status(user_id, is_active)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -31,6 +34,7 @@ async def reward_user(
     echoes: int = Query(0),
     shards: int = Query(0),
     deps: Dependencies = Depends(Dependencies)):
+    logger.info("user_was_awarded", extra = f"{user_id=}, {echoes=}, {shards=}")
     user = await deps.auth_service.apply_reward(user_id, echoes, shards)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

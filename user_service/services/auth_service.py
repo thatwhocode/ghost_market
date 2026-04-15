@@ -69,7 +69,7 @@ class AuthService:
         if not data_to_update:
             return await self.user_repo.find_user_by_id(user_id)
         
-        return await self.user_repo.update_user(user_id, data_to_update)
+        return await self.user_repo.update_user_by_id(user_id, data_to_update)
 
     async def list_users(self, skip: int, limit: int):
         return await self.user_repo.get_all_users(skip, limit)

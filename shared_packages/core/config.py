@@ -2,14 +2,14 @@ import os
 from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import computed_field, model_validator
-
+from typing import ClassVar
 class SharedBaseSettings(BaseSettings):
     """
     Базовий клас. Містить логіку читання секретів та загальні налаштування.
     """
     APP_NAME: str = "Microservice"
     MODE: str = "DEV"
-    
+    APP_VERSION: ClassVar[str] = "0.0.0.1"
 
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

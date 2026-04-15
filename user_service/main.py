@@ -5,7 +5,13 @@ from user_service.api import auth
 from user_service.api import admin
 from fastapi.middleware.cors import CORSMiddleware
 from user_service.api.middleware import db_exception_middleware
+from user_service.middleware import TraceIDMiddleware
+from user_service.logging_config import configure_logging
+from shared_packages.core.config import SharedBaseSettings
+stgs = SharedBaseSettings()
+configure_logging(env="development")
 @asynccontextmanager
+
 async def lifespan(app: FastAPI):
     try:
         yield
@@ -13,9 +19,13 @@ async def lifespan(app: FastAPI):
         print(e)
     finally:
         pass
-
-api_version_prefix = "v1"
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="Ghost market game backend", description="Api for game backend managment", version="0.0.0.1", contact={"name":"thatwhocode", "email":"thatwhocode@gmail.com"},lifespan=lifespan)
 app.middleware("http")(db_exception_middleware)
-app.include_router(auth.router, prefix=f"/{api_version_prefix}/auth", tags=["Auth"])
+app.add_middleware(TraceIDMiddleware)
+app.include_router(auth.router, prefix=f"/{stgs.APP_VERSION}/auth", tags=["Auth"])
 app.include_router(admin.router)
+@app.get("/version")
+def version_getter():
+    return {"version" : f"{stgs.APP_VERSION}"}
+import structlog
+logger = structlog.get_logger()
