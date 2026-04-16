@@ -28,15 +28,13 @@ class Dependencies:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return user
-    async def get_current_admin(self, token: str = Depends(oauth2_scheme)) -> User:
-        user = await self.auth_service.get_user_from_token(token)
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        if not user.is_superuser:
-            raise HTTPException(status_code=403, detail="Rights required")
-        return user
 class AdminRequired:
-    async def __call__(self, deps: Dependencies = Depends(Dependencies)):
-        return await deps.get_current_admin()
+    async def __call__(self, deps: Dependencies = Depends(), token:str = Depends(oauth2_scheme)):
+        user = await deps.auth_service.get_user_from_token(token)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no such user")
+        if not user.is_superuser:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="admin role required")
+        return user
     
-admin_guard = AdminRequired()
+    

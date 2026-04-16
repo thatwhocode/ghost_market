@@ -77,6 +77,32 @@ class PostgresSettings(SharedBaseSettings):
         
         return f"postgresql+asyncpg://{user}:{password}@ghost_market_db:{self.POSTGRES_PORT}/{postgres_db}"
 
+class AdminSettings(SharedBaseSettings):
+    """
+    Налаштування для ініціалізації першого адміністратора
+    """
+    ADMIN_EMAIL_FILE: Optional[str] = None
+    ADMIN_EMAIL: str = "admin@ghost.market"
+
+    ADMIN_USERNAME_FILE: Optional[str] = None
+    ADMIN_USERNAME: str = "ghost_admin"
+
+    ADMIN_PASSWORD_FILE: Optional[str] = None
+    ADMIN_PASSWORD: Optional[str] = None  # Обов'язково через секрет або env
+
+    @model_validator(mode='after')
+    def set_admin_secrets(self) -> 'AdminSettings':
+        self.ADMIN_EMAIL = self._get_secret_value(
+            self.ADMIN_EMAIL_FILE, self.ADMIN_EMAIL, "ADMIN_EMAIL"
+        )
+        self.ADMIN_USERNAME = self._get_secret_value(
+            self.ADMIN_USERNAME_FILE, self.ADMIN_USERNAME, "ADMIN_USERNAME"
+        )
+        self.ADMIN_PASSWORD = self._get_secret_value(
+            self.ADMIN_PASSWORD_FILE, self.ADMIN_PASSWORD, "ADMIN_PASSWORD"
+        )
+        return self
+
 
 class RedisSettings(SharedBaseSettings):
     """
@@ -89,3 +115,5 @@ class RedisSettings(SharedBaseSettings):
     @property
     def REDIS_URL(self) -> str:
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/0"
+
+admin_settings = AdminSettings()

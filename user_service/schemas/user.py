@@ -7,7 +7,7 @@ class UserBase(CoreModel):
     username: str = Field(..., min_length=3, max_length=50, examples=['cool_user_123'])
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8, description="Password must be 8 charactes long")
+    password: SecretStr = Field(..., min_length=8, description="Password must be 8 charactes long")
 
 class UserRead(UserBase):
     id: UUID
