@@ -19,5 +19,5 @@ async def test_register_user_ssl_flow():
         "password": "secure_password123"
     }
     async with httpx.AsyncClient(base_url=BASE_URL, verify=False) as client:
-        response = await client.post("/v1/auth/register", json=payload)
+        response = await client.post("/0.0.0.1/auth/register", json=payload)
         assert response.status_code in [200, 201]

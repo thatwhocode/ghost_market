@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from user_service.schemas.user import UserCreate, UserLoginEmail, UserRead, UserLoginUsername, UserUpdate, UserShort
 from user_service.api.deps import Dependencies, AuthService, oauth2_scheme
@@ -74,3 +74,8 @@ async def update_my_profile(
 @router.get("/leaderboard", response_model=list[UserShort])
 async def get_leaderboard(deps: Dependencies = Depends()):
     return await deps.user_repo.get_top_players(limit=10)
+@router.delete("/user/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: UUID, deps : Dependencies = Depends(Dependencies)):
+    logger.info("user_was_deleted", extra = f"{user_id=}")
+    if await deps.auth_service.delete_user(user_id) == True:
+        return status.HTTP_204_NO_CONTENT

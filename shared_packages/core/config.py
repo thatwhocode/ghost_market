@@ -9,8 +9,8 @@ class SharedBaseSettings(BaseSettings):
     """
     APP_NAME: str = "Microservice"
     MODE: str = "DEV"
-    APP_VERSION: ClassVar[str] = "0.0.0.1"
-
+    APP_VERSION: str = "0.0.0.1"
+    APP_VERSION_FILE : Optional[str] = None
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     

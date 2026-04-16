@@ -85,3 +85,8 @@ class AuthService:
     async def get_stats(self) -> AdminStatsRead:
         data = await self.user_repo.get_admin_stats()
         return AdminStatsRead.model_validate(data)
+    async def delete_user(self, user_id : UUID):
+        if await self.user_repo.find_user_by_id(user_id=user_id) is not None:
+            await self.user_repo.delete_user_by_id(user_id)
+            await self.user_repo.session.commit()
+            return True

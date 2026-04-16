@@ -23,9 +23,9 @@ app = FastAPI(title="Ghost market game backend", description="Api for game backe
 app.middleware("http")(db_exception_middleware)
 app.add_middleware(TraceIDMiddleware)
 app.include_router(auth.router, prefix=f"/{stgs.APP_VERSION}/auth", tags=["Auth"])
-app.include_router(admin.router)
+app.include_router(admin.router, prefix=f"/{stgs.APP_VERSION}", tags=["Admin"])
 @app.get("/version")
 def version_getter():
     return {"version" : f"{stgs.APP_VERSION}"}
-import structlog
+import structlog    
 logger = structlog.get_logger()

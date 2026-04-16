@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, func
+from sqlalchemy import select, update, func, delete
 from shared_packages.db.user  import User
 from user_service.schemas.user import UserBase, UserLogin, UserRead, AdminStatsRead
 from uuid import UUID
@@ -101,3 +101,7 @@ class UserRepository():
         )
         result = await self.session.execute(query)
         return result.mappings().one()
+    async def delete_user_by_id(self, user_id:UUID):
+        query = delete(User).where(User.id == user_id)
+        await self.session.execute(query)
+        await self.session.flush()
