@@ -3,10 +3,10 @@ import pytest_asyncio
 import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from testcontainers.postgres import PostgresContainer
-from user_service.db.database import Base, get_db  # get_db — це твій dependency у FastAPI
+from user_service.db.database import Base, get_db  
 from httpx import AsyncClient, ASGITransport
 from user_service.main import app
-from shared_packages.core.security import create_access_token # Твоя функція створення токенів
+from shared_packages.core.security import create_access_token 
 from uuid import uuid4
 @pytest.fixture
 def regular_user_token_headers():
