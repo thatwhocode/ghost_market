@@ -7,14 +7,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from user_service.api.middleware import db_exception_middleware
 from user_service.middleware import TraceIDMiddleware
 from user_service.logging_config import configure_logging
-from shared_packages.core.config import SharedBaseSettings
+from shared_packages.core.config import SharedBaseSettings, RedisSettings
+from user_service.services.redis import RedisService
 stgs = SharedBaseSettings()
+redis_settings = RedisSettings()
 configure_logging(env="development")
 @asynccontextmanager
 
 async def lifespan(app: FastAPI):
     try:
+        redis = RedisService(redis_settings.REDIS_URL)
+        app.state.redis = redis
         yield
+        await app.state.redis.close()
     except Exception as e:
         print(e)
     finally:

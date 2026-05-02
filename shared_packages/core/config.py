@@ -105,15 +105,15 @@ class AdminSettings(SharedBaseSettings):
 
 
 class RedisSettings(SharedBaseSettings):
+    """ Redis
     """
-    На майбутнє для Redis
-    """
-    REDIS_HOST: str = "localhost"
+    REDIS_HOST: str = "ghost_redis"
     REDIS_PORT: int = 6379
-    
+    REDIS_PASSWORD_FILE: Optional[str] = None
+    REDIS_PASSWORD : str =  "my_strong_redis_password"
     @computed_field
     @property
     def REDIS_URL(self) -> str:
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/0"
-
+        password = self._get_secret_value(self.REDIS_PASSWORD_FILE, self.REDIS_PASSWORD, "password")
+        return f"redis://:{password}@{self.REDIS_HOST}:{self.REDIS_PORT}/0"
 admin_settings = AdminSettings()

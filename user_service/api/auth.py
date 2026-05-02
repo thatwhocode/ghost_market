@@ -2,10 +2,12 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from user_service.schemas.user import UserCreate, UserLoginEmail, UserRead, UserLoginUsername, UserUpdate, UserShort
-from user_service.api.deps import Dependencies, AuthService, oauth2_scheme, AdminRequired
+from user_service.api.deps import Dependencies, AuthService, oauth2_scheme, AdminRequired, get_redis_service, get_validated_payload, get_current_user
 from shared_packages.schemas.token import Token
 from uuid import UUID
 from user_service.schemas.user import UserBase
+from user_service.services.redis import RedisService
+from datetime import timezone, datetime
 import structlog
 router = APIRouter()
 oauth_schema = OAuth2PasswordBearer(tokenUrl="0.0.0.1/auth/token")
@@ -54,12 +56,8 @@ async def login_for_swagger(
         logger.info("username", extra  = f"{form_data.username}")
         return await deps.auth_service.login_with_username(login_data)
 @router.get("/me", response_model=UserRead)
-async def get_me(
-    token: str = Depends(oauth_schema), 
-    deps: Dependencies = Depends()
-):
-    user = await deps.auth_service.get_user_from_token(token)
-    return user
+async def get_me(current_user = Depends(get_current_user)):
+    return current_user
 @router.patch("/me/update", response_model=UserRead)
 async def update_my_profile(
     update_data: UserUpdate, 
@@ -79,3 +77,12 @@ async def delete_user(user_id: UUID, deps : Dependencies = Depends(Dependencies)
     logger.info("user_was_deleted", extra = f"{user_id=}")
     if await deps.auth_service.delete_user(user_id) == True:
         return status.HTTP_204_NO_CONTENT
+@router.post("/logout")
+async def logout(payload : dict = Depends(get_validated_payload), redis: RedisService = Depends(get_redis_service)):
+    jti = payload.get("jti")
+    exp = payload.get("exp")
+    now = int(datetime.now(timezone.utc).timestamp())
+    ttl = exp - now
+    if ttl> 0 :
+        await redis.add_to_blacklist(jti, ttl)
+    return{"message": "Succesfully logged out. See you soon!"}
