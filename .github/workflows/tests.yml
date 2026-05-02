@@ -17,7 +17,7 @@ jobs:
           echo "testpass" > secrets/postgres_auth_password.txt
           echo "localhost" > secrets/postgres_auth_host_name.txt
           echo "supersecret" > secrets/jwt_secret_key.txt
-
+          echo "redis_password" > secrets/redis_password.txt
           mkdir -p nginx/ssl
           openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
             -keyout nginx/ssl/nginx.key \
