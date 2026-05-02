@@ -60,6 +60,7 @@ jobs:
      - name: Run SSL Integration Tests
        run: |
           pip install httpx pytest pytest-asyncio sqlalchemy testcontainers pydantic_settings asyncpg
+          pip install -r user_service/requirements.txt
           PYTHONPATH=. pytest -W ignore::urllib3.exceptions.InsecureRequestWarning
      - name: Deploy to Windows Branch
        if: success()
