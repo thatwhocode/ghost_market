@@ -41,16 +41,25 @@ jobs:
           docker compose logs nginx
      - name: Check conts status
        run: docker ps
-     - name: Wait for migrations and startup
-       run: sleep 30
-     - name: Wait for SSL Services
+     - name: Wait for App to be fully ready
        run: |
-          for i in {1..10}; do
-            curl -k https://localhost/docs && break || sleep 5
+          echo "Waiting for FastAPI to complete migrations and start..."
+          # Спроби протягом 60 секунд
+          for i in {1..12}; do
+            # -k для SSL, -s для тиші, -f щоб curl вважав 502 помилкою
+            if curl -k -s -f https://localhost/docs > /dev/null; then
+              echo "App is UP!"
+              exit 0
+            fi
+            echo "Attempt $i/12: App is not ready yet (probably running migrations)..."
+            sleep 5
           done
+          echo "Timeout: App did not start in time."
+          docker compose logs ghost_api
+          exit 1
      - name: Run SSL Integration Tests
        run: |
-          pip install httpx pytest pytest-asyncio sqlalchemy testcontainers
+          pip install httpx pytest pytest-asyncio sqlalchemy testcontainers pydantic_settings
           # PYTHONPATH=. дозволяє знайти модулі, якщо тести лежать у папці
           PYTHONPATH=. pytest -W ignore::urllib3.exceptions.InsecureRequestWarning user_service/tests/test_integration.py
 
