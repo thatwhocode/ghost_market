@@ -18,6 +18,9 @@ jobs:
           echo "localhost" > secrets/postgres_auth_host_name.txt
           echo "supersecret" > secrets/jwt_secret_key.txt
           echo "redis_password" > secrets/redis_password.txt
+          echo "default_admin" > secrets/admin_username.txt
+          echo "12345678">secrets/admin_password.txt
+          echo "admin@test.com"> secrets/admin_email.txt
           mkdir -p nginx/ssl
           openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
             -keyout nginx/ssl/nginx.key \
