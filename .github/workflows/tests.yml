@@ -59,7 +59,8 @@ jobs:
           exit 1
      - name: Run SSL Integration Tests
        run: |
-          pip install httpx pytest pytest-asyncio sqlalchemy testcontainers pydantic_settings
+          pip install -r user_service/requirements.txt
+          pip install httpx pytest pytest-asyncio sqlalchemy testcontainers pydantic_settings asyncpg
           # PYTHONPATH=. дозволяє знайти модулі, якщо тести лежать у папці
           PYTHONPATH=. pytest -W ignore::urllib3.exceptions.InsecureRequestWarning user_service/tests/test_integration.py
 
