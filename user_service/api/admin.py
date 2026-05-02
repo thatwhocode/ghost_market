@@ -7,7 +7,7 @@ import structlog
 logger = structlog.get_logger()
 async def check_admin_access(deps: Dependencies = Depends(Dependencies)):
     await deps.get_current_admin()
-router = APIRouter(prefix="/v1/admin", tags=["Admin"], dependencies=[Depends(AdminRequired())])
+router = APIRouter(prefix="/admin", tags=["Admin"], dependencies=[Depends(AdminRequired())])
 @router.get("/users", response_model=list[UserAdminView])
 async def list_all_users(
     skip: int = 0,

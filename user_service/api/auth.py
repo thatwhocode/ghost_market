@@ -8,7 +8,7 @@ from uuid import UUID
 from user_service.schemas.user import UserBase
 import structlog
 router = APIRouter()
-oauth_schema = OAuth2PasswordBearer(tokenUrl="v1/auth/token")
+oauth_schema = OAuth2PasswordBearer(tokenUrl="0.0.0.1/auth/token")
 logger = structlog.get_logger()
 @router.post("/register",  response_model = UserRead)
 async def register(user_data : UserCreate, deps : Dependencies =  Depends(Dependencies)):

@@ -5,7 +5,6 @@ from shared_packages.db.user import User
 from user_service.core.security import get_password_hash
 from sqlalchemy import select, update
 import asyncio
-
 async def create_first_admin():
     if admin_settings.ADMIN_PASSWORD == "missing_secret":
         print("❌ Error: ADMIN_PASSWORD not found in secrets or env!")
@@ -19,7 +18,6 @@ async def create_first_admin():
             if admin:
                 print(f"ℹ️ Admin already exists: {admin.username}")
                 return
-
             new_admin = User(
                 email=admin_settings.ADMIN_EMAIL,
                 username=admin_settings.ADMIN_USERNAME,

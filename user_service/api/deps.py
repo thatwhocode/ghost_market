@@ -6,8 +6,9 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from shared_packages.db.user import User
 from fastapi import HTTPException, status
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="v1/auth/token")
+from shared_packages.core.config import SharedBaseSettings
+stgs = SharedBaseSettings()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{stgs.APP_VERSION}/auth/token")
 class Dependencies:
     def __init__(self, db : AsyncSession =Depends(get_db)):
         self.db = db

@@ -27,7 +27,6 @@ class UserRepository():
         )
         self.session.add(new_user)
         await self.session.flush()
-        await self.session.refresh(new_user)
         return new_user
     async def find_user_by_id(self, user_id : UUID)-> UserRead:
         query = select(User).where(User.id == user_id)

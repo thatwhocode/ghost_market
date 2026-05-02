@@ -31,7 +31,7 @@ class AuthService:
         if username:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                      detail="this username already exist")
-        new_user = self.user_repo.create_user(user_data)
+        new_user =  await self.user_repo.create_user(user_data)
         await self.user_repo.session.refresh(new_user)
         await self.user_repo.session.commit()
         return new_user
