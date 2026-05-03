@@ -1,10 +1,11 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Boolean, DateTime, func, Integer
-from sqlalchemy.orm import Mapped, mapped_column
-
+from sqlalchemy import String, Boolean, DateTime, func, Integer, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from user_service.db.database import Base
-
+from typing import List, TYPE_CHECKING
+if TYPE_CHECKING:
+    from shared_packages.db.card import Card
 class User(Base):
     __tablename__ = "users"
     id: Mapped[uuid.UUID] = mapped_column(
@@ -29,3 +30,4 @@ class User(Base):
     wallet_echoes : Mapped[int] = mapped_column(Integer, default=0)
     shards : Mapped[int] = mapped_column(Integer, default=0)
     reputation: Mapped[int] = mapped_column(Integer, default=0)
+    cards : Mapped[List["Card"]] =relationship("Card", back_populates="owner")

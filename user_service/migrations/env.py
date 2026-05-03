@@ -6,8 +6,11 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 sys.path.insert(0, "/app")
 from alembic import context
-
-from shared_packages.db.user import User  
+from sqlalchemy.dialects.postgresql import ENUM, UUID
+from shared_packages.db.user import User
+from shared_packages.db.card import Card, CardToSkill
+from shared_packages.db.skill_template import SkillTemplate
+from shared_packages.db.card_template import CardTemplate
 from user_service.db.database import Base, settings 
 
 config = context.config

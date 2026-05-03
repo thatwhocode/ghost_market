@@ -61,11 +61,10 @@ async def get_me(current_user = Depends(get_current_user)):
 @router.patch("/me/update", response_model=UserRead)
 async def update_my_profile(
     update_data: UserUpdate, 
-    token: str = Depends(oauth2_scheme),
+    current_user = Depends(get_current_user),
     deps: Dependencies = Depends(Dependencies)
 ):
     logger.info("User info update start")
-    current_user = await deps.get_current_user(token)
     logger.info("current_data", extra = f"{current_user.username, current_user.email, current_user.updated_at, current_user.is_active, current_user.is_superuser}")
     logger.info("data_to_update", extra = update_data.model_dump())
     return await deps.auth_service.update_profile(current_user.id, update_data)

@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 from typing import AsyncGenerator
-
 from shared_packages.core.config import PostgresSettings
 
 
